@@ -1,57 +1,33 @@
-from collections import defaultdict
-import sys
-sys.setrecursionlimit(2000000)
-def to_graph(edges):
-    graph = defaultdict(list)
-    for edge in edges:
-        node1,node2 = edge
-        graph[node1].append(node2)
-        graph[node2].append(node1)
 
-    return graph
-n,m = list(map(int,input().split()))
-edges = []
+def dfs(u):
+    global isCycle
+    stack = [u]
+    while stack:
+        curr = stack.pop()
+        vis[curr] = True
+        if len(adj[curr]) != 2:
+            isCycle = False
+        for v in adj[curr]:
+            if not vis[v]:
+                stack.append(v)
+
+n, m = map(int, input().split())
+global adj, vis, isCycle
+adj = [[] for _ in range(n+1)]
+vis = [False] * (n+1)
+isCycle = True
+
 for _ in range(m):
-    edge = list(map(int,input().split()))
-    edges.append(edge)
-graph = to_graph(edges)
+    u, v = map(int, input().split())
+    adj[u].append(v)
+    adj[v].append(u)
 
+ans = 0
+for i in range(1, n+1):
+    if not vis[i]:
+        isCycle = True
+        dfs(i)
+        if isCycle:
+            ans += 1
 
-# go to code
-answer = 0
-visited = set()
-
-def dfs(initial,arr):
-    if initial in cant:
-        return (arr,False)
-    if initial in visited:
-        return (arr,True)  
-    visited.add(initial)
-    arr.append(initial)
-
-    for nod in graph[initial]:
-        if nod in cant:
-            return (arr,False)
-        dfs(nod,arr)
-        visited.add(nod)
-    return (arr,True)
-
-cant = set()
-for i,j in graph.items():
-    if len(j) != 2:
-        cant.add(i)
-for i,j in graph.items():
-    if i in visited or i in cant:
-        continue
-    arry ,check = dfs(i,[])
-    if check:
-        answer += 1
-        for k in arry:
-            visited.add(k)
-
-print(answer)            
-
-
-
-
-
+print(ans)
